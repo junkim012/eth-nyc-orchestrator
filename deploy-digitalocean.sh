@@ -21,8 +21,8 @@ sudo npm install -g pm2
 
 # Create app directory
 echo "📁 Setting up application directory..."
-cd /home/$(whoami)
-APP_DIR="/home/$(whoami)/eth-nyc-orchestrator"
+cd $HOME
+APP_DIR="$HOME/eth-nyc-orchestrator"
 
 # Clone the repository
 echo "📥 Cloning repository..."
