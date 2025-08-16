@@ -22,8 +22,7 @@ async function startServer() {
       'POCKETBASE_ADMIN_PASSWORD',
       'USDC_ADDRESS',
       'PYUSD_ADDRESS',
-      'UNISWAP_V3_ROUTER',
-      'UNISWAP_V3_FACTORY'
+      'ROUTER_ADDRESS'
     ];
 
     const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);

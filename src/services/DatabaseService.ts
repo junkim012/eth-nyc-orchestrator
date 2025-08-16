@@ -1,12 +1,20 @@
 import { UserMapping, CreateUserMappingRequest } from '../models/UserMapping';
 
 export class DatabaseService {
+  private static instance: DatabaseService;
   private pb: any;
   private initialized: Promise<void>;
   private depositAddressCache: Set<string> = new Set();
 
-  constructor(url: string = process.env.POCKETBASE_URL || 'http://localhost:8090') {
+  private constructor(url: string = process.env.POCKETBASE_URL || 'http://localhost:8090') {
     this.initialized = this.initializePocketBase(url);
+  }
+
+  public static getInstance(): DatabaseService {
+    if (!DatabaseService.instance) {
+      DatabaseService.instance = new DatabaseService();
+    }
+    return DatabaseService.instance;
   }
 
   private async initializePocketBase(url: string): Promise<void> {
@@ -120,5 +128,18 @@ export class DatabaseService {
     } catch (error) {
       console.warn('Failed to initialize deposit address cache:', error);
     }
+  }
+
+  // Get cached deposit addresses for monitoring
+  getCachedDepositAddresses(): string[] {
+    return Array.from(this.depositAddressCache);
+  }
+
+  // Get cache statistics
+  getCacheStats(): { size: number; addresses: string[] } {
+    return {
+      size: this.depositAddressCache.size,
+      addresses: Array.from(this.depositAddressCache)
+    };
   }
 }

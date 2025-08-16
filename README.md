@@ -1,13 +1,13 @@
 # USDC to pyUSD Orchestrator
 
-A TypeScript service that allows users to create deposit addresses and automatically swaps received USDC to pyUSD via Uniswap.
+A TypeScript service that allows users to create deposit addresses and automatically swaps received USDC to pyUSD via a custom Router contract.
 
 ## Features
 
 - **API Endpoint**: `/create-deposit-address` - Creates a unique deposit address for each user
 - **Database**: PocketBase integration for storing user-to-deposit address mappings
 - **Event Listener**: Monitors Ethereum for USDC transfers to deposit addresses
-- **Automated Swaps**: Automatically swaps USDC to pyUSD using Uniswap V3
+- **Automated Swaps**: Automatically swaps USDC to pyUSD using custom Router contract
 
 ## Architecture
 
@@ -70,8 +70,7 @@ npm run dev
 | `PORT` | Server port (default: 3000) |
 | `USDC_ADDRESS` | USDC contract address |
 | `PYUSD_ADDRESS` | pyUSD contract address |
-| `UNISWAP_V3_ROUTER` | Uniswap V3 router address |
-| `UNISWAP_V3_FACTORY` | Uniswap V3 factory address |
+| `ROUTER_ADDRESS` | Custom Router contract address |
 
 ## API Endpoints
 
@@ -103,8 +102,7 @@ Health check endpoint.
 
 - **USDC**: `0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48`
 - **pyUSD**: `0x6c3ea9036406852006290770BEdFcAbA0e23A0e8`
-- **Uniswap V3 Router**: `0xE592427A0AEce92De3Edee1F18E0157C05861564`
-- **Uniswap V3 Factory**: `0x1F98431c8aD98523631AE4a59f267346ea31F984`
+- **Router**: `your-deployed-router-contract-address`
 
 ## Security Considerations
 
@@ -154,7 +152,7 @@ npm run build
 ### Common Issues
 
 1. **Event listener not working**: Check RPC endpoint and network connectivity
-2. **Swaps failing**: Ensure sufficient ETH for gas and valid pool exists
+2. **Swaps failing**: Ensure sufficient ETH for gas and Router contract is properly deployed
 3. **Database errors**: Verify PocketBase connection and schema
 4. **Address validation**: Ensure proper Ethereum address format
 

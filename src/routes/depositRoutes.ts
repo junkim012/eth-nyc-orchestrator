@@ -5,6 +5,59 @@ import { CreateUserMappingRequest } from '../models/UserMapping';
 
 const router = Router();
 
+router.get('/cached-monitoring-addresses', async (req: Request, res: Response) => {
+  try {
+    const dbService = DatabaseService.getInstance();
+    await dbService.authenticate();
+
+    // Get database addresses and cache stats
+    const allAddresses = await dbService.getAllDepositAddresses();
+    const cacheStats = dbService.getCacheStats();
+    
+    res.json({
+      message: 'Cached monitoring addresses retrieved successfully',
+      database: {
+        totalAddresses: allAddresses.length,
+        addresses: allAddresses
+      },
+      cache: {
+        size: cacheStats.size,
+        addresses: cacheStats.addresses
+      },
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('Error retrieving cached monitoring addresses:', error);
+    res.status(500).json({
+      error: 'Internal server error'
+    });
+  }
+});
+
+router.post('/refresh-cache', async (req: Request, res: Response) => {
+  try {
+    const dbService = DatabaseService.getInstance();
+    await dbService.authenticate();
+    await dbService.initializeCache();
+
+    const cacheStats = dbService.getCacheStats();
+    
+    res.json({
+      message: 'Cache refreshed successfully',
+      cacheSize: cacheStats.size,
+      addresses: cacheStats.addresses,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('Error refreshing cache:', error);
+    res.status(500).json({
+      error: 'Internal server error'
+    });
+  }
+});
+
 router.post('/create-deposit-address', async (req: Request, res: Response) => {
   try {
     const { userPublicAddress }: CreateUserMappingRequest = req.body;
@@ -21,7 +74,7 @@ router.post('/create-deposit-address', async (req: Request, res: Response) => {
       });
     }
 
-    const dbService = new DatabaseService();
+    const dbService = DatabaseService.getInstance();
     await dbService.authenticate();
 
     // Check if user already has a deposit address

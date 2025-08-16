@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { DatabaseService } from './DatabaseService';
-import { UniswapService } from './UniswapService';
+import { RouterService } from './RouterService';
 
 const USDC_ABI = [
   "event Transfer(address indexed from, address indexed to, uint256 value)"
@@ -10,7 +10,7 @@ export class EthereumService {
   private provider: ethers.Provider;
   private usdcContract: ethers.Contract;
   private dbService: DatabaseService;
-  private uniswapService: UniswapService;
+  private routerService: RouterService;
 
   constructor() {
     this.provider = new ethers.JsonRpcProvider(process.env.ETHEREUM_RPC_URL);
@@ -19,8 +19,8 @@ export class EthereumService {
       USDC_ABI,
       this.provider
     );
-    this.dbService = new DatabaseService();
-    this.uniswapService = new UniswapService();
+    this.dbService = DatabaseService.getInstance();
+    this.routerService = new RouterService();
   }
 
   async startListening(): Promise<void> {
@@ -42,8 +42,6 @@ export class EthereumService {
   }
 
   private async handleUSDCTransfer(from: string, to: string, value: bigint, event: any): Promise<void> {
-    // console.log(`USDC Transfer detected: ${from} -> ${to}, value: ${ethers.formatUnits(value, 6)} USDC`);
-
     // Check if the destination address is one of our deposit addresses
     const userMapping = await this.dbService.getUserMappingByDepositAddress(to);
     
@@ -52,13 +50,26 @@ export class EthereumService {
       return;
     }
 
-    console.log(`Transfer to our deposit address detected for user: ${userMapping.userPublicAddress}`);
+    // Log detailed event information for monitored addresses
+    console.log('=================== USDC TRANSFER EVENT ===================');
+    console.log(`Event Details:`);
+    console.log(`  From Address: ${from}`);
+    console.log(`  To Address (Deposit): ${to}`);
+    console.log(`  Amount: ${ethers.formatUnits(value, 6)} USDC`);
+    console.log(`  Amount (Raw): ${value.toString()}`);
+    console.log(`  Block Number: ${event.blockNumber}`);
+    console.log(`  Transaction Hash: ${event.transactionHash}`);
+    console.log(`  Log Index: ${event.logIndex}`);
+    console.log(`User Mapping:`);
+    console.log(`  User Public Address: ${userMapping.userPublicAddress}`);
+    console.log(`  Deposit Address: ${userMapping.depositAddress}`);
+    console.log(`  Mapping ID: ${userMapping.id}`);
+    console.log('========================================================');
 
     try {
-      // Perform USDC to pyUSD swap
-      const swapResult = await this.uniswapService.swapUSDCtoPyUSD(
+      // Perform USDC to pyUSD swap using Router contract
+      const swapResult = await this.routerService.swapUSDCtoPyUSD(
         userMapping.privateKey,
-        value,
         userMapping.userPublicAddress
       );
 
