@@ -111,4 +111,45 @@ router.post('/create-deposit-address', async (req: Request, res: Response) => {
   }
 });
 
+router.get('/get-deposit-address', async (req: Request, res: Response) => {
+  try {
+    const { userPublicAddress } = req.query;
+
+    if (!userPublicAddress || typeof userPublicAddress !== 'string') {
+      return res.status(400).json({
+        error: 'userPublicAddress query parameter is required'
+      });
+    }
+
+    if (!WalletService.isValidEthereumAddress(userPublicAddress)) {
+      return res.status(400).json({
+        error: 'Invalid Ethereum address format'
+      });
+    }
+
+    const dbService = DatabaseService.getInstance();
+    await dbService.authenticate();
+
+    // Check if user exists
+    const existingMapping = await dbService.getUserMappingByUserAddress(userPublicAddress);
+    if (!existingMapping) {
+      return res.status(404).json({
+        error: 'User does not exist'
+      });
+    }
+
+    res.json({
+      depositAddress: existingMapping.depositAddress,
+      userPublicAddress: existingMapping.userPublicAddress,
+      message: 'Deposit address retrieved successfully'
+    });
+
+  } catch (error) {
+    console.error('Error retrieving deposit address:', error);
+    res.status(500).json({
+      error: 'Internal server error'
+    });
+  }
+});
+
 export default router;
