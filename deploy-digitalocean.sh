@@ -22,18 +22,16 @@ sudo npm install -g pm2
 # Create app directory
 echo "📁 Setting up application directory..."
 cd /home/$(whoami)
-APP_DIR="/home/$(whoami)/orchestrator"
+APP_DIR="/home/$(whoami)/eth-nyc-orchestrator"
 
-# Clone the repository (replace with your actual repository URL)
+# Clone the repository
 echo "📥 Cloning repository..."
 if [ -d "$APP_DIR" ]; then
     echo "Directory exists, pulling latest changes..."
     cd $APP_DIR
     git pull
 else
-    echo "Please update this script with your repository URL:"
-    echo "git clone YOUR_REPO_URL orchestrator"
-    exit 1
+    git clone https://github.com/junkim012/eth-nyc-orchestrator.git eth-nyc-orchestrator
 fi
 
 cd $APP_DIR
