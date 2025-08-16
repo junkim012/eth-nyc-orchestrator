@@ -7,7 +7,9 @@
     "start": "node dist/index.js",
     "dev": "ts-node src/index.ts",
     "build": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "deploy:railway": "railway up",
+    "logs:railway": "railway logs"
   },
   "dependencies": {
     "cors": "^2.8.5",
