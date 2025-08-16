@@ -1,0 +1,64 @@
+[
+  {
+    "id": "pbc_3142635821",
+    "created": "2024-01-01 00:00:00.000Z",
+    "updated": "2024-01-01 00:00:00.000Z",
+    "name": "user_mappings",
+    "type": "base",
+    "system": false,
+    "schema": [
+      {
+        "system": false,
+        "id": "userPublicAddress",
+        "name": "userPublicAddress",
+        "type": "text",
+        "required": true,
+        "presentable": false,
+        "unique": true,
+        "options": {
+          "min": 42,
+          "max": 42,
+          "pattern": "^0x[a-fA-F0-9]{40}$"
+        }
+      },
+      {
+        "system": false,
+        "id": "depositAddress",
+        "name": "depositAddress",
+        "type": "text",
+        "required": true,
+        "presentable": false,
+        "unique": true,
+        "options": {
+          "min": 42,
+          "max": 42,
+          "pattern": "^0x[a-fA-F0-9]{40}$"
+        }
+      },
+      {
+        "system": false,
+        "id": "privateKey",
+        "name": "privateKey",
+        "type": "text",
+        "required": true,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": 66,
+          "max": 66,
+          "pattern": "^0x[a-fA-F0-9]{64}$"
+        }
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX idx_user_mappings_userPublicAddress ON user_mappings (userPublicAddress)",
+      "CREATE UNIQUE INDEX idx_user_mappings_depositAddress ON user_mappings (depositAddress)"
+    ],
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "options": {}
+  }
+]
