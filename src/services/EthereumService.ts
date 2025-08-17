@@ -74,6 +74,21 @@ export class EthereumService {
       );
 
       console.log(`Swap completed successfully. Transaction hash: ${swapResult.transactionHash}`);
+
+      // Store transaction data in PocketBase
+      try {
+        await this.dbService.createTransaction({
+          userPublicAddress: userMapping.userPublicAddress,
+          depositAddress: userMapping.depositAddress,
+          transactionHash: swapResult.transactionHash,
+          amountIn: ethers.formatUnits(value, 6), // USDC amount (6 decimals)
+          amountOut: ethers.formatUnits(swapResult.amountOut, 6), // pyUSD amount (6 decimals)
+          timestamp: new Date().toISOString()
+        });
+        console.log('Transaction data stored successfully');
+      } catch (dbError) {
+        console.error('Failed to store transaction data:', dbError);
+      }
     } catch (error) {
       console.error('Failed to perform swap:', error);
       // In a production system, you might want to implement retry logic

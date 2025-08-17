@@ -152,4 +152,41 @@ router.get('/get-deposit-address', async (req: Request, res: Response) => {
   }
 });
 
+router.get('/transactions', async (req: Request, res: Response) => {
+  try {
+    const { userPublicAddress } = req.query;
+
+    if (!userPublicAddress || typeof userPublicAddress !== 'string') {
+      return res.status(400).json({
+        error: 'userPublicAddress query parameter is required'
+      });
+    }
+
+    if (!WalletService.isValidEthereumAddress(userPublicAddress)) {
+      return res.status(400).json({
+        error: 'Invalid Ethereum address format'
+      });
+    }
+
+    const dbService = DatabaseService.getInstance();
+    await dbService.authenticate();
+
+    // Get all transactions for the user
+    const transactions = await dbService.getTransactionsByUserAddress(userPublicAddress);
+
+    res.json({
+      userPublicAddress,
+      transactions,
+      count: transactions.length,
+      message: 'Transactions retrieved successfully'
+    });
+
+  } catch (error) {
+    console.error('Error retrieving transactions:', error);
+    res.status(500).json({
+      error: 'Internal server error'
+    });
+  }
+});
+
 export default router;

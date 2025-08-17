@@ -1,4 +1,5 @@
 import { UserMapping, CreateUserMappingRequest } from '../models/UserMapping';
+import { Transaction, CreateTransactionRequest } from '../models/Transaction';
 
 export class DatabaseService {
   private static instance: DatabaseService;
@@ -141,5 +142,32 @@ export class DatabaseService {
       size: this.depositAddressCache.size,
       addresses: Array.from(this.depositAddressCache)
     };
+  }
+
+  // Transaction methods
+  async createTransaction(transaction: CreateTransactionRequest): Promise<Transaction> {
+    try {
+      await this.ensureInitialized();
+      const record = await this.pb.collection('transactions').create(transaction);
+      return record as unknown as Transaction;
+    } catch (error) {
+      console.error('Failed to create transaction:', error);
+      throw error;
+    }
+  }
+
+  async getTransactionsByUserAddress(userPublicAddress: string): Promise<Transaction[]> {
+    try {
+      await this.ensureInitialized();
+      const records = await this.pb.collection('transactions')
+        .getFullList({
+          filter: `userPublicAddress="${userPublicAddress}"`,
+          sort: '-created'
+        });
+      return records as unknown as Transaction[];
+    } catch (error) {
+      console.error('Failed to get transactions by user address:', error);
+      throw error;
+    }
   }
 }
